@@ -35,7 +35,7 @@ public class NorthwindApp {
                         displayAllProducts(connection);
                         break;
                     case 2:
-                        //displayAllCustomers(connection);
+                        displayAllCustomers(connection);
                         break;
                     default:
                         System.out.println("Invalid choice");
@@ -77,6 +77,34 @@ public class NorthwindApp {
 
     }
 
+    private static void displayAllCustomers(Connection connection) {
+
+        try (
+
+                PreparedStatement preparedStatement = connection.prepareStatement("""
+                        SELECT
+                            ContactName,
+                            CompanyName,
+                            City,
+                            Country,
+                            Phone
+                        FROM
+                            Customers
+                        ORDER BY
+                            Country;
+                        """
+                );
+
+                ResultSet results = preparedStatement.executeQuery();
+
+        ) {
+            printResults(results);
+        } catch (SQLException e) {
+            System.out.println("Could not get all the customers");
+            System.exit(1);
+        }
+
+    }
 
     //this method will be used in the displayMethods to actually print the results to the screen
     private static void printResults(ResultSet results) throws SQLException {
