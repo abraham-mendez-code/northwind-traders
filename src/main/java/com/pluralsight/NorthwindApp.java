@@ -12,6 +12,11 @@ public class NorthwindApp {
         String username = System.getenv("username");
         String password = System.getenv("password");
 
+        if (username == null || password== null){
+            System.out.println("Error: username or password not set in the environment.");
+            System.exit(1);
+        }
+
         startMenu(username, password);
 
     }
