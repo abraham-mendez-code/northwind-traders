@@ -24,6 +24,7 @@ public class NorthwindApp {
                         What do you want to do?
                             1) Display All Products
                             2) Display All Customers
+                            3) Display All Categories
                             0) Exit
                         Select an option:\s""");
 
@@ -37,6 +38,9 @@ public class NorthwindApp {
                     case 2:
                         displayAllCustomers(connection);
                         break;
+                    case 3:
+                        displayAllCategories(connection);
+                        break;
                     default:
                         System.out.println("Invalid choice");
                 }
@@ -48,7 +52,7 @@ public class NorthwindApp {
         }
     }
 
-
+    // this method displays all products in the database sorted by product name
     private static void displayAllProducts(Connection connection) {
 
         try (
@@ -77,6 +81,7 @@ public class NorthwindApp {
 
     }
 
+    // this method displays all customers in the database sorted by country
     private static void displayAllCustomers(Connection connection) {
 
         try (
@@ -106,12 +111,42 @@ public class NorthwindApp {
 
     }
 
-    //this method will be used in the displayMethods to actually print the results to the screen
+    // this method displays all products in the database sorted by product name
+    private static void displayAllCategories(Connection connection) {
+
+        try (
+
+                PreparedStatement preparedStatement = connection.prepareStatement("""
+                        SELECT
+                            CategoryID,
+                            CategoryName
+                        FROM
+                            Categories
+                        ORDER BY
+                            CategoryID;
+                        """
+                );
+
+                ResultSet results = preparedStatement.executeQuery();
+
+        ) {
+            printResults(results);
+        } catch (SQLException e) {
+            System.out.println("Could not get all the categories");
+            System.exit(1);
+        }
+
+    }
+
+    // this method will be used in the displayMethods to actually print the results to the screen
     private static void printResults(ResultSet results) throws SQLException {
-        //get the metadata so we have access to the field names
+        // get the metadata so we have access to the field names
         ResultSetMetaData metaData = results.getMetaData();
-        //get the number of rows returned
+        // get the number of rows returned
         int columnCount = metaData.getColumnCount();
+
+        // prints an empty line to make the results prettier
+        System.out.println();
 
         while (results.next()) {
 
