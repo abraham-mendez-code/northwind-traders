@@ -5,22 +5,23 @@ import java.util.Scanner;
 
 public class NorthwindApp {
 
+    private static Scanner scanner = new Scanner(System.in);
+
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         String username = System.getenv("username");
         String password = System.getenv("password");
 
-        Scanner scanner = new Scanner(System.in);
-
-        startMenu(username, password, scanner);
+        startMenu(username, password);
 
     }
 
-    private static void startMenu(String username, String password, Scanner scanner) {
+    // this method display the start menu options for the app
+    private static void startMenu(String username, String password) {
         // try to connect to the northwind database using the username and password we provided
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/northwind", username, password)){
 
             while (true){
-                System.out.print("""
+                int input = getAInteger("""
                         What do you want to do?
                             1) Display All Products
                             2) Display All Customers
@@ -28,7 +29,7 @@ public class NorthwindApp {
                             0) Exit
                         Select an option:\s""");
 
-                switch (scanner.nextInt()) {
+                switch (input) {
                     case 0:
                         System.out.println("Goodbye!");
                         System.exit(0);
@@ -40,6 +41,7 @@ public class NorthwindApp {
                         break;
                     case 3:
                         displayAllCategories(connection);
+                        displayProductsByCategory(connection, getAInteger("Select a Category ID: "));
                         break;
                     default:
                         System.out.println("Invalid choice");
@@ -66,7 +68,7 @@ public class NorthwindApp {
                         FROM
                             Products
                         ORDER BY
-                            ProductName;
+                            ProductID;
                         """
                 );
 
@@ -76,6 +78,37 @@ public class NorthwindApp {
             printResults(results);
         } catch (SQLException e) {
             System.out.println("Could not get all the products");
+            System.exit(1);
+        }
+
+    }
+
+    // this method displays products from a user specified category sorted by product name
+    private static void displayProductsByCategory(Connection connection, int categoryID) {
+
+        try (
+
+                PreparedStatement preparedStatement = connection.prepareStatement(String.format("""
+                        SELECT
+                            ProductID,
+                            ProductName,
+                            UnitPrice,
+                            UnitsInStock
+                        FROM
+                            Products
+                        WHERE
+                            CategoryID = %d
+                        ORDER BY
+                            ProductID;
+                        """
+                , categoryID));
+
+                ResultSet results = preparedStatement.executeQuery();
+
+        ) {
+            printResults(results);
+        } catch (SQLException e) {
+            System.out.println("Could not get the products");
             System.exit(1);
         }
 
@@ -168,4 +201,17 @@ public class NorthwindApp {
 
     }
 
+    public static int getAInteger(String message) {
+        int input;
+        while (true) {
+            try {
+                System.out.print(message);
+                input = Integer.parseInt(scanner.nextLine());
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Only numbers allowed");
+            }
+        }
+        return input;
+    }
 }
