@@ -1,5 +1,6 @@
 package com.pluralsight;
 
+import org.apache.commons.dbcp2.BasicDataSource;
 import java.sql.*;
 import java.util.Scanner;
 
@@ -17,8 +18,14 @@ public class NorthwindApp {
 
     // this method display the start menu options for the app
     private static void startMenu(String username, String password) {
+
+        BasicDataSource ds = new BasicDataSource();
+        ds.setUrl("jdbc:mysql://localhost:3306/northwind");
+        ds.setUsername(username);
+        ds.setPassword(password);
+
         // try to connect to the northwind database using the username and password we provided
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/northwind", username, password)){
+        try (Connection connection = ds.getConnection()){
 
             while (true){
                 int input = getAInteger("""
