@@ -98,27 +98,28 @@ public class NorthwindApp {
     // this method displays products from a user specified category sorted by product name
     private static void displayProductsByCategory(Connection connection, int categoryID) {
 
+        String sql = """
+                SELECT
+                    ProductID,
+                    ProductName,
+                    UnitPrice,
+                    UnitsInStock
+                FROM
+                    Products
+                WHERE
+                    CategoryID = ?
+                ORDER BY
+                    ProductID;
+                """;
         try (
-
-                PreparedStatement preparedStatement = connection.prepareStatement(String.format("""
-                        SELECT
-                            ProductID,
-                            ProductName,
-                            UnitPrice,
-                            UnitsInStock
-                        FROM
-                            Products
-                        WHERE
-                            CategoryID = %d
-                        ORDER BY
-                            ProductID;
-                        """
-                , categoryID));
-
-                ResultSet results = preparedStatement.executeQuery();
-
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
         ) {
-            printResults(results);
+            preparedStatement.setInt(1, categoryID);
+            try (ResultSet results = preparedStatement.executeQuery()) {
+                printResults(results);
+            } catch (SQLException e) {
+                System.out.println("Unable to execute the query: " + e);
+            }
         } catch (SQLException e) {
             System.out.println("Could not get the products");
             System.exit(1);
@@ -130,7 +131,6 @@ public class NorthwindApp {
     private static void displayAllCustomers(Connection connection) {
 
         try (
-
                 PreparedStatement preparedStatement = connection.prepareStatement("""
                         SELECT
                             ContactName,
@@ -144,9 +144,7 @@ public class NorthwindApp {
                             Country;
                         """
                 );
-
-                ResultSet results = preparedStatement.executeQuery();
-
+                ResultSet results = preparedStatement.executeQuery()
         ) {
             printResults(results);
         } catch (SQLException e) {
@@ -160,7 +158,6 @@ public class NorthwindApp {
     private static void displayAllCategories(Connection connection) {
 
         try (
-
                 PreparedStatement preparedStatement = connection.prepareStatement("""
                         SELECT
                             CategoryID,
@@ -171,9 +168,7 @@ public class NorthwindApp {
                             CategoryID;
                         """
                 );
-
-                ResultSet results = preparedStatement.executeQuery();
-
+                ResultSet results = preparedStatement.executeQuery()
         ) {
             printResults(results);
         } catch (SQLException e) {
