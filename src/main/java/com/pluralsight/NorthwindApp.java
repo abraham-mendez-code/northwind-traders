@@ -69,23 +69,20 @@ public class NorthwindApp {
     // this method displays all products in the database sorted by product name
     private static void displayAllProducts(Connection connection) {
 
+        String sql = """
+                SELECT
+                    ProductID,
+                    ProductName,
+                    UnitPrice,
+                    UnitsInStock
+                FROM
+                    Products
+                ORDER BY
+                    ProductID;
+                """;
         try (
-
-                PreparedStatement preparedStatement = connection.prepareStatement("""
-                        SELECT
-                            ProductID,
-                            ProductName,
-                            UnitPrice,
-                            UnitsInStock
-                        FROM
-                            Products
-                        ORDER BY
-                            ProductID;
-                        """
-                );
-
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
                 ResultSet results = preparedStatement.executeQuery();
-
         ) {
             printResults(results);
         } catch (SQLException e) {
@@ -103,7 +100,8 @@ public class NorthwindApp {
                     ProductID,
                     ProductName,
                     UnitPrice,
-                    UnitsInStock
+                    UnitsInStock,
+                    CategoryID
                 FROM
                     Products
                 WHERE
@@ -117,11 +115,9 @@ public class NorthwindApp {
             preparedStatement.setInt(1, categoryID);
             try (ResultSet results = preparedStatement.executeQuery()) {
                 printResults(results);
-            } catch (SQLException e) {
-                System.out.println("Unable to execute the query: " + e);
             }
         } catch (SQLException e) {
-            System.out.println("Could not get the products");
+            System.out.println("Could not get the products" + e);
             System.exit(1);
         }
 
@@ -130,20 +126,20 @@ public class NorthwindApp {
     // this method displays all customers in the database sorted by country
     private static void displayAllCustomers(Connection connection) {
 
+        String sql = """
+                SELECT
+                    ContactName,
+                    CompanyName,
+                    City,
+                    Country,
+                    Phone
+                FROM
+                    Customers
+                ORDER BY
+                    Country;
+                """;
         try (
-                PreparedStatement preparedStatement = connection.prepareStatement("""
-                        SELECT
-                            ContactName,
-                            CompanyName,
-                            City,
-                            Country,
-                            Phone
-                        FROM
-                            Customers
-                        ORDER BY
-                            Country;
-                        """
-                );
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
                 ResultSet results = preparedStatement.executeQuery()
         ) {
             printResults(results);
@@ -157,17 +153,17 @@ public class NorthwindApp {
     // this method displays all products in the database sorted by product name
     private static void displayAllCategories(Connection connection) {
 
+        String sql = """
+                SELECT
+                    CategoryID,
+                    CategoryName
+                FROM
+                    Categories
+                ORDER BY
+                    CategoryID;
+                """;
         try (
-                PreparedStatement preparedStatement = connection.prepareStatement("""
-                        SELECT
-                            CategoryID,
-                            CategoryName
-                        FROM
-                            Categories
-                        ORDER BY
-                            CategoryID;
-                        """
-                );
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
                 ResultSet results = preparedStatement.executeQuery()
         ) {
             printResults(results);
